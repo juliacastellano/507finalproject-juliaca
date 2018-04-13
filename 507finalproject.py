@@ -71,79 +71,63 @@ for item in table_rows:
         category_url = baseurl + url_end
         category_dict[x_text]= category_url
 
-# print(category_dict.keys())
-# # for item in category_dict:
-# #     print(item.keys())
+
 class Food():
     def __init__(self, f_url):
         self.f_url = f_url
 
-        conn = sqlite3.connect(db_name)
-        cur = conn.cursor()
+        self.calories_title = "Calories"
+        self.calories = 0
+        self.calories_dv = 0
 
-        statement = '''
-            DROP TABLE IF EXISTS 'Nutrition_Facts';
-        '''
-        cur.execute(statement)
-        conn.commit()
+        self.fat_title = "Total Fat"
+        self.fat = 0
+        self.fat_dv = 0
 
-        statement = '''
-            CREATE TABLE 'Nutrition_Facts'(
-            'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
-            'Name' TEXT,
-            'Calories' INTEGER,
-            'CaloriesDV' INTEGER,
-            'TotalFat' INTEGER,
-            'TotalFatDV' INTEGER,
-            'Cholesterol' INTEGER,
-            'CholesterolDV' INTEGER,
-            'Sodium' INTEGER,
-            'SodiumDV' INTEGER,
-            'TotalCarbohydrates' INTEGER,
-            'TotalCarbohydratesDV' INTEGER,
-            'Fiber' INTEGER,
-            'FiberDV' INTEGER,
-            'Sugar' INTEGER,
-            'SugarDV' INTEGER,
-            'Protein' INTEGER,
-            'ProteinDV' INTEGER
-            );
-            '''
-        cur.execute(statement)
-        conn.commit()
+        self.cholesterol_title = "Cholesterol"
+        self.cholesterol = 0
+        self.cholesterol_dv = 0
 
+        self.sodium_title = "Sodium"
+        self.sodium = 0
+        self.sodium_dv = 0
 
-        statement = '''
-            DROP TABLE IF EXISTS 'Vitamins_and_Minerals';
-        '''
-        cur.execute(statement)
-        conn.commit()
+        self.carbs_title = "Total Carbohydrates"
+        self.carbs = 0
+        self.carbs_dv = 0
 
-        statement = '''
-            CREATE TABLE 'Vitamins_and_Minerals'(
-            'Name' TEXT,
-            'VitaminA' INTEGER,
-            'VitaminADV' INTEGER,
-            'VitaminC' INTEGER,
-            'VitaminCDV' INTEGER,
-            'Calcium' INTEGER,
-            'CalciumDV' INTEGER,
-            'Potassium' INTEGER,
-            'PotassiumDV' INTEGER,
-            'Iron' INTEGER,
-            'IronDV' INTEGER,
-            'FoodId' INTEGER,
-            FOREIGN KEY ('FoodId') REFERENCES 'Nutrition_Facts'('Id')
-            );
-            '''
-        cur.execute(statement)
-        conn.commit()
+        self.fiber_title = "Fiber"
+        self.fiber = 0
+        self.fiber_dv = 0
 
+        self.sugar_title = "Sugar"
+        self.sugar = 0
+        self.sugar_dv = 0
 
-        # individual_food_request = make_request_using_cache(individual_food_url)
-        # individual_food_soup = BeautifulSoup(individual_food_request, 'html.parser')
-        # item_details = individual_food_soup.find_all(class_='item')
-        # print(item_details)
+        self.protein_title = "Protein"
+        self.protein = 0
+        self.protein_dv = 0
+
+        self.vita_title = "Vitamin A"
+        self.vita = 0
+        self.vita_dv = 0
+
+        self.vitc_title = "Vitamin C"
+        self.vitc = 0
+        self.vitc_dv = 0
+
+        self.calcium_title = "Calcium"
+        self.calcium = 0
+        self.calcium_dv = 0
+
+        self.potassium_title = "Potassium"
+        self.potassium = 0
+        self.potassium_dv = 0
+
+        self.iron_title = "Iron"
+        self.iron = 0
+        self.iron_dv = 0
+
 
         individual_food_request = make_request_using_cache(f_url)
         individual_food_soup = BeautifulSoup(individual_food_request, 'html.parser')
@@ -158,11 +142,7 @@ class Food():
 
         for item in serving:
             self.name += " (" + item + ")"
-        # print(fn.text)
-        # for item in food_name:
-        #     print(item)
-        # print(food_name)
-        # print(item_details)
+
         for k in item_details:
             facts_split = k.text.split("\n")
             del(facts_split[0])
@@ -170,75 +150,75 @@ class Food():
             # print(facts_split)
 
             if facts_split[0] == "Calories (%DV based on daily intake of 2,000 kcal)":
-                self.calories_title = "Calories"
-                self.calories = facts_split[1].strip('kcal')
-                self.calories_dv = facts_split[2].strip('%')
+                if facts_split[1].strip('kcal') != "NA":
+                    self.calories = facts_split[1].strip('kcal')
+                if facts_split[2].strip('%') != "NA":
+                    self.calories_dv = facts_split[2].strip('%')
             if facts_split[0] == "Total Fat (DRI 65 g)":
-                self.fat_title = "Total Fat"
-                self.fat = facts_split[1].strip('g')
-                self.fat_dv = facts_split[2].strip('%')
+                if facts_split[1].strip('g') != "NA":
+                    self.fat = facts_split[1].strip('g')
+                if facts_split[2].strip('%') != "NA":
+                    self.fat_dv = facts_split[2].strip('%')
             if facts_split[0] == "Cholesterol (DRI 300 mg)":
-                self.cholesterol_title = "Cholesterol"
-                self.cholesterol = facts_split[1].strip('mg')
-                self.cholesterol_dv = facts_split[2].strip('%')
+                if facts_split[1].strip('mg') != "NA":
+                    self.cholesterol = facts_split[1].strip('mg')
+                if facts_split[2].strip('%') != "NA":
+                    self.cholesterol_dv = facts_split[2].strip('%')
             if facts_split[0] == "Sodium (DRI 2,400 mg)":
-                self.sodium_title = "Sodium"
-                self.sodium = facts_split[1].strip('mg')
-                self.sodium_dv = facts_split[2].strip('%')
+                if facts_split[1].strip('mg') != "NA":
+                    self.sodium = facts_split[1].strip('mg')
+                if facts_split[2].strip('%') != "NA":
+                    self.sodium_dv = facts_split[2].strip('%')
             if facts_split[0] == "Total Carbohydrate (DRI 300 g)":
-                self.carbs_title = "Total Carbohydrates"
-                self.carbs = facts_split[1].strip('g')
-                self.carbs_dv = facts_split[2].strip('%')
+                if facts_split[1].strip('g') != "NA":
+                    self.carbs = facts_split[1].strip('g')
+                if facts_split[2].strip('%') != "NA":
+                    self.carbs_dv = facts_split[2].strip('%')
             if facts_split[0] == "Dietary Fiber (DRI 25 g)":
-                self.fiber_title = "Fiber"
-                self.fiber = facts_split[1].strip('g')
-                self.fiber_dv = facts_split[2].strip('%')
+                if facts_split[1].strip('g') != "NA":
+                    self.fiber = facts_split[1].strip('g')
+                if facts_split[2].strip('%') != "NA":
+                    self.fiber_dv = facts_split[2].strip('%')
             if facts_split[0] == "Sugars (WHO recommended maximum daily intake 25 g)":
-                self.sugar_title = "Sugar"
-                self.sugar = facts_split[1].strip('g')
-                self.sugar_dv = facts_split[2].strip('%')
+                if facts_split[1].strip('g') != "NA":
+                    self.sugar = facts_split[1].strip('g')
+                if facts_split[2].strip('%') != "NA":
+                    self.sugar_dv = facts_split[2].strip('%')
             if facts_split[0] == "Protein (DRI 50 g)":
-                self.protein_title = "Protein"
-                self.protein = facts_split[0].strip('g')
-                self.protein_dv = facts_split[1].strip('%')
+                if facts_split[1].strip('g') != "NA":
+                    self.protein = facts_split[1].strip('g')
+                if facts_split[2].strip('%') != "NA":
+                    self.protein_dv = facts_split[2].strip('%')
             if facts_split[0] == "Vitamin A (DRI 5000 IU)":
-                self.vita_title = "Vitamin A"
-                self.vita = facts_split[1].strip('IU')
-                self.vita_dv = facts_split[2].strip('%')
+                if facts_split[1].strip('IU') != "NA":
+                    self.vita = facts_split[1].strip('IU')
+                if facts_split[2].strip('%') != "NA":
+                    self.vita_dv = facts_split[2].strip('%')
             if facts_split[0] == "Vitamin C (DRI 60 mg)":
-                self.vitc_title = "Vitamin C"
-                self.vitc = facts_split[1].strip('mg')
-                self.vitc_dv = facts_split[2].strip('%')
+                if facts_split[1].strip('mg') != "NA":
+                    self.vitc = facts_split[1].strip('mg')
+                if facts_split[2].strip('%') != "NA":
+                    self.vitc_dv = facts_split[2].strip('%')
             if facts_split[0] == "Calcium (DRI 1000 mg)":
-                self.calcium_title = "Calcium"
-                self.calcium = facts_split[1].strip('mg')
-                self.calcium_dv = facts_split[2].strip('%')
+                if facts_split[1].strip('mg') != "NA":
+                    self.calcium = facts_split[1].strip('mg')
+                if facts_split[2].strip('%') != "NA":
+                    self.calcium_dv = facts_split[2].strip('%')
             if facts_split[0] == "Potassium (DRI 3500)":
-                self.potassium_title = "Potassium"
-                self.potassium = facts_split[1].strip('mg')
-                self.potassium_dv = facts_split[2].strip('%')
+                if facts_split[1].strip('mg') != "NA":
+                    self.potassium = facts_split[1].strip('mg')
+                if facts_split[2].strip('%') != "NA":
+                    self.potassium_dv = facts_split[2].strip('%')
             if facts_split[0] == "Iron (DRI 18 mg)":
-                self.iron_title = "Iron"
-                self.iron = facts_split[1].strip('mg')
-                self.iron_dv = facts_split[2].strip('%')
-
-
-            # insertion = (self.name,self.calories,self.calories_dv,self.fat,self.fat_dv,
-            #             self.cholesterol,self.cholesterol_dv,self.sodium,self.sodium_dv,
-            #             self.carbs,self.carbs_dv,self.fiber,self.fiber_dv,self.sugar,
-            #             self.sugar_dv,self.protein,self.protein_dv)
-            # statement = 'INSERT INTO "Nutrition Facts" '
-            # statement += 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-            # cur.execute(statement, insertion)
-            # conn.commit()
-
-
-        conn.close()
+                if facts_split[1].strip('mg') != "NA":
+                    self.iron = facts_split[1].strip('mg')
+                if facts_split[2].strip('%') != "NA":
+                    self.iron_dv = facts_split[2].strip('%')
 
 
 
-food_class_list = []
 def get_food_data(food_name):
+    food_class_list = []
     food_url = category_dict[food_name]
     # print(food_url)
     food_request = make_request_using_cache(food_url)
@@ -250,22 +230,71 @@ def get_food_data(food_name):
         food_href = item.find('a')['href']
         individual_food_url = baseurl + food_href
         food_class_list.append(Food(individual_food_url))
-        # print(individual_food_url)
-        # individual_food_request = make_request_using_cache(individual_food_url)
-        # individual_food_soup = BeautifulSoup(individual_food_request, 'html.parser')
-        # item_details = individual_food_soup.find_all(class_='item')
-        # # print(item_details)
-        # for k in item_details:
-        #     print(k.text.split("\n"))
-            # if "Calories " == k.text[:9]:
-            #     print(k.text)
-        #     deets = k.find(class_='value cals')
-        #     print(deets)
-            # if k[0].text == "Total Fat":
-    #         #     print(k[0].text)
 
+    return food_class_list
+
+def make_database(list_food):
+    food_class_list = list_food
     conn = sqlite3.connect(db_name)
     cur = conn.cursor()
+
+    statement = '''
+        DROP TABLE IF EXISTS 'Nutrition_Facts';
+    '''
+    cur.execute(statement)
+    conn.commit()
+
+    statement = '''
+        CREATE TABLE 'Nutrition_Facts'(
+        'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
+        'Name' TEXT,
+        'Calories' INTEGER,
+        'CaloriesDV' INTEGER,
+        'TotalFat' INTEGER,
+        'TotalFatDV' INTEGER,
+        'Cholesterol' INTEGER,
+        'CholesterolDV' INTEGER,
+        'Sodium' INTEGER,
+        'SodiumDV' INTEGER,
+        'TotalCarbohydrates' INTEGER,
+        'TotalCarbohydratesDV' INTEGER,
+        'Fiber' INTEGER,
+        'FiberDV' INTEGER,
+        'Sugar' INTEGER,
+        'SugarDV' INTEGER,
+        'Protein' INTEGER,
+        'ProteinDV' INTEGER
+        );
+        '''
+    cur.execute(statement)
+    conn.commit()
+
+
+    statement = '''
+        DROP TABLE IF EXISTS 'Vitamins_and_Minerals';
+    '''
+    cur.execute(statement)
+    conn.commit()
+
+    statement = '''
+        CREATE TABLE 'Vitamins_and_Minerals'(
+        'Name' TEXT,
+        'VitaminA' INTEGER,
+        'VitaminADV' INTEGER,
+        'VitaminC' INTEGER,
+        'VitaminCDV' INTEGER,
+        'Calcium' INTEGER,
+        'CalciumDV' INTEGER,
+        'Potassium' INTEGER,
+        'PotassiumDV' INTEGER,
+        'Iron' INTEGER,
+        'IronDV' INTEGER,
+        'FoodId' INTEGER,
+        FOREIGN KEY ('FoodId') REFERENCES 'Nutrition_Facts'('Id')
+        );
+        '''
+    cur.execute(statement)
+    conn.commit()
 
     for item in food_class_list:
         insertion = (None,item.name,item.calories,item.calories_dv,item.fat,item.fat_dv,
@@ -298,39 +327,136 @@ def get_food_data(food_name):
 
     conn.close()
 
-get_food_data("Bread")
+def ask_user():
+    user_input = ""
+    baked = []
+    prompt_choices = """
+            bread
+            cake
+            cookies
+            pasta and rice
+            alcohol
+                (includes beer, spirits, cocktails, and wine)
+            butter
+                (includes butter and margarine)
+            cooked fish
+            fresh fish
+            fruit
+                (includes apples, apricots, berries, citrus, grapes, melons,
+                peaches, pears, plums, tropical)
+            Beef
+            Lamb
+            Pork
+                 """
 
+    while user_input != "exit":
+        if user_input == "":
+            print(prompt_choices)
+            user_input = input("Please choose one of the options above (or 'help' for options): ")
+        elif user_input == "help":
+            print(prompt_choices)
+            user_input = input("Please choose one of the options above: ")
+        elif user_input == "bread":
+            bread = get_food_data("Bread")
+            make_database(bread)
+            user_input = input("Please choose one of the options above (or 'help' for options): ")
+        elif user_input == "cake":
+            cake = get_food_data("Cake")
+            make_database(cake)
+            user_input = input("Please choose one of the options above (or 'help' for options): ")
+        elif user_input == "cookies":
+            cookies = get_food_data("Cookies")
+            make_database(cookies)
+            user_input = input("Please choose one of the options above (or 'help' for options): ")
+        elif user_input == "pasta and rice":
+            pasta_rice = []
+            pasta = get_food_data("Pasta & Noodles")
+            rice = get_food_data("Rice")
+            for item in pasta:
+                pasta_rice.append(item)
+            for k in rice:
+                pasta_rice.append(k)
+            make_database(pasta_rice)
+            user_input = input("Please choose one of the options above (or 'help' for options): ")
+        elif user_input == "alcohol":
+            alcohol = []
+            beer = get_food_data("Beer")
+            spirits = get_food_data("Spirits & Cocktails")
+            wine = get_food_data("Wine")
+            for item in beer:
+                alcohol.append(item)
+            for k in spirits:
+                alcohol.append(k)
+            for x in wine:
+                alcohol.append(x)
+            make_database(alcohol)
+            user_input = input("Please choose one of the options above (or 'help' for options): ")
+        elif user_input == "butter":
+            butter = get_food_data("Butter & Margarine")
+            make_database(butter)
+            user_input = input("Please choose one of the options above (or 'help' for options): ")
+        elif user_input == "cooked fish":
+            cooked_fish = get_food_data("Cooked Finfish")
+            make_database(cooked_fish)
+            user_input = input("Please choose one of the options above (or 'help' for options): ")
+        elif user_input == "cooked fish":
+            fresh_fish = get_food_data("Fresh Finfish")
+            make_database(fresh_fish)
+            user_input = input("Please choose one of the options above (or 'help' for options): ")
+        elif user_input == "fruit":
+            fruit = []
+            apples = get_food_data("Apples")
+            apricots = get_food_data("Apricots")
+            berries = get_food_data("Berries")
+            citrus = get_food_data("Citrus")
+            grapes = get_food_data("Grapes")
+            melon = get_food_data("Melons")
+            peaches = get_food_data("Peaches")
+            pears = get_food_data("Pears")
+            plums = get_food_data("Plums")
+            tropical = get_food_data("Tropical")
+            for a in apples:
+                fruit.append(a)
+            for k in apricots:
+                fruit.append(k)
+            for b in berries:
+                fruit.append(b)
+            for c in citrus:
+                fruit.append(c)
+            for g in grapes:
+                fruit.append(g)
+            for m in melon:
+                fruit.append(m)
+            for p in peaches:
+                fruit.append(p)
+            for z in pears:
+                fruit.append(z)
+            for y in plums:
+                fruit.append(y)
+            for t in tropical:
+                fruit.append(t)
+            make_database(fruit)
+            user_input = input("Please choose one of the options above (or 'help' for options): ")
+        elif user_input == "beef":
+            beef = get_food_data("Beef")
+            make_database(beef)
+            user_input = input("Please choose one of the options above (or 'help' for options): ")
+        elif user_input == "lamb":
+            lamb = get_food_data("Lamb")
+            make_database(lamb)
+            user_input = input("Please choose one of the options above (or 'help' for options): ")
+        elif user_input == "pork":
+            pork = get_food_data("Pork")
+            make_database(pork)
+            user_input = input("Please choose one of the options above (or 'help' for options): ")
+        else:
+            print("Sorry, that is not a valid option")
+            user_input = input("Please choose one of the options above (or 'help' for options): ")
 
+    print("Bye!")
 
-
-
-
-# for item in table_rows:
-#     print(item.text)
-# food_tags_dict = {}
-# food_url = ""
-# for item in table_rows:
-#     url_end = item.find('a')['href']
-#     food_url = baseurl + url_end
-#     food_tags_dict[item.text] = food_url
-#     # print(food_url)
-#
-# chicken_end = food_tags_dict["chicken"]
-# chicken_url = baseurl + chicken_end
-# # print(chicken_url)
-# chicken_request = make_request_using_cache(chicken_url)
-# chicken_text = chicken_request.text
-# chicken_soup = BeautifulSoup(chicken_request,'html.parser')
-# chicken_items = chicken_soup.find(class_='food_search_results')
-# chicken_desc = chicken_items.find_all(class_="food_description")
-#
-# chicken_dict = {}
-# for item in chicken_desc:
-#     chicken_url_end = item.find('a')['href']
-#     individual_chicken_text = item.text
-#     # print(individual_chicken_text)
-#     individual_chicken_url = baseurl + chicken_url_end
-#     # print(individual_chicken_url)
-#     chicken_dict[individual_chicken_text] = individual_chicken_url
-#
-# print(chicken_dict)
+ask_user()
+# bread = get_food_data("Bread")
+# # for item in bread:
+# #     print(item.vita)
+# make_database(bread)
