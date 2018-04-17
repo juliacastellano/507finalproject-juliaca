@@ -2,11 +2,10 @@ import requests
 import json
 import sys
 import ssl
-import secrets
 import sqlite3
 from bs4 import BeautifulSoup
 import plotly.plotly as py
-import csv
+import plotly.graph_objs as go
 
 CACHE_FNAME = 'final_project_cache.json'
 db_name = 'final_project_db.sqlite'
@@ -279,6 +278,8 @@ def make_database(list_food):
     statement = '''
         CREATE TABLE 'Vitamins_and_Minerals'(
         'Name' TEXT,
+        'FoodId' INTEGER,
+        'Calories' INTEGER,
         'VitaminA' INTEGER,
         'VitaminADV' INTEGER,
         'VitaminC' INTEGER,
@@ -289,8 +290,8 @@ def make_database(list_food):
         'PotassiumDV' INTEGER,
         'Iron' INTEGER,
         'IronDV' INTEGER,
-        'FoodId' INTEGER,
         FOREIGN KEY ('FoodId') REFERENCES 'Nutrition_Facts'('Id')
+        FOREIGN KEY ('Calories') REFERENCES 'Nutrition_Facts'('Calories')
         );
         '''
     cur.execute(statement)
@@ -306,11 +307,11 @@ def make_database(list_food):
         cur.execute(statement, insertion)
         conn.commit()
 
-        insertion = (item.name,item.vita,item.vita_dv,item.vitc,item.vitc_dv,
+        insertion = (item.name, None, None, item.vita,item.vita_dv,item.vitc,item.vitc_dv,
                     item.calcium,item.calcium_dv,item.potassium,item.potassium_dv,
-                    item.iron,item.iron_dv, None)
+                    item.iron,item.iron_dv)
         statement = 'INSERT INTO "Vitamins_and_Minerals" '
-        statement += 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        statement += 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         cur.execute(statement, insertion)
         conn.commit()
 
@@ -325,7 +326,253 @@ def make_database(list_food):
         cur.execute(statement)
         conn.commit()
 
+        statement = '''
+        UPDATE Vitamins_and_Minerals
+        SET Calories = (
+        SELECT Nutrition_Facts.Calories
+        FROM Nutrition_Facts
+        WHERE Nutrition_Facts.Name = Vitamins_and_Minerals.Name
+        )
+        '''
+        cur.execute(statement)
+        conn.commit()
+
     conn.close()
+
+def plotly_data(lst):
+    plotly_list = []
+    plotly_dict = {}
+    i = 1
+
+    for item in lst:
+        plotly_dict['fat'] = float(item.fat)
+        plotly_dict['protein'] = float(item.protein)
+        plotly_dict['carbs'] = float(item.carbs)
+        point_i = "point " + str(i)
+        plotly_dict['label'] = point_i
+        plotly_list.append(plotly_dict)
+        i += 1
+        plotly_dict = {}
+
+    return plotly_list
+
+def makeAxis(title, tickangle):
+    return {
+      'title': title,
+      'titlefont': { 'size': 20 },
+      'tickangle': tickangle,
+      'tickfont': { 'size': 15 },
+      'tickcolor': 'rgba(0,0,0,0)',
+      'ticklen': 5,
+      'showline': True,
+      'showgrid': True
+    }
+
+def plot_ternary(lst):
+    rawData = plotly_data(lst)
+
+    data = [{
+        'type': 'scatterternary',
+        'mode': 'markers',
+        'a': [i for i in map(lambda x: x['fat'], rawData)],
+        'b': [i for i in map(lambda x: x['protein'], rawData)],
+        'c': [i for i in map(lambda x: x['carbs'], rawData)],
+        'text': [i for i in map(lambda x: x['label'], rawData)],
+        'marker': {
+            'symbol': 100,
+            'color': '#DB7365',
+            'size': 14,
+            'line': { 'width': 2 }
+        },
+        }]
+
+    layout = {
+        'ternary': {
+            'sum': 100,
+            'aaxis': makeAxis('Fat', 0),
+            'baxis': makeAxis('<br>Protein', 45),
+            'caxis': makeAxis('<br>Carbs', -45)
+        },
+        'annotations': [{
+          'showarrow': False,
+          'text': 'Simple Ternary Plot with Markers',
+            'x': 0.5,
+            'y': 1.3,
+            'font': { 'size': 15 }
+        }]
+    }
+
+    fig = {'data': data, 'layout': layout}
+    py.plot(fig, validate=False)
+
+
+def stacked_bar_data():
+    vit_list = []
+    conn = sqlite3.connect(db_name)
+    cur = conn.cursor()
+
+    statement = '''
+    SELECT AVG(VitaminA), AVG(VitaminC), AVG(Calcium), AVG(Potassium), AVG(Iron)
+    FROM Vitamins_and_Minerals
+    '''
+    cur.execute(statement)
+    conn.commit()
+
+    for item in cur:
+        vita = round(item[0]/1000,2)
+        vitc = round(item[1], 2)
+        calc = round(item[2], 2)
+        pot = round(item[3], 2)
+        iron = round(item[4], 2)
+
+    vit_list = [vita, vitc, iron, calc, pot]
+
+    return vit_list
+
+stacked_bar_data()
+def make_stacked_bar():
+    lst = stacked_bar_data()
+
+    trace1 = go.Bar(
+        x=['VitaminA(mg)', 'VitaminC(mg)', 'Iron(mg)', 'Calcium(mg)', 'Potassium(mg)'],
+        y=lst,
+        name='Vitamins and Minerals'
+    )
+    trace2 = go.Bar(
+        x=['VitaminA(mg)', 'VitaminC(mg)', 'Iron(mg)', 'Calcium(mg)', 'Potassium(mg)'],
+        y=[0.9, 90, 18, 1300, 4700],
+        name='Recommended Daily Value of Vitamins and Minerals'
+    )
+
+    data = [trace1, trace2]
+    layout = go.Layout(
+        barmode='stack'
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+    py.plot(fig, filename='stacked-bar')
+
+    # x = ['VitaminA(mg)', 'VitaminC(mg)', 'Iron(mg)']
+    # y = lst
+    # y2 = [0.9, 90, 18]
+    #
+    # trace1 = go.Bar(
+    #     x=x,
+    #     y=y,
+    #     text=y,
+    #     textposition = 'auto',
+    #     marker=dict(
+    #         color='rgb(158,202,225)',
+    #         line=dict(
+    #             color='rgb(8,48,107)',
+    #             width=1.5),
+    #         ),
+    #     opacity=0.6
+    # )
+    #
+    # trace2 = go.Bar(
+    #     x=x,
+    #     y=y2,
+    #     text=y2,
+    #     textposition = 'auto',
+    #     marker=dict(
+    #         color='rgb(58,200,225)',
+    #         line=dict(
+    #             color='rgb(8,48,107)',
+    #             width=1.5),
+    #         ),
+    #     opacity=0.6
+    # )
+    #
+    # data = [trace1,trace2]
+    #
+    # py.plot(data, filename='grouped-bar-direct-labels')
+
+def get_nutrition_data():
+    nut_list = []
+    conn = sqlite3.connect(db_name)
+    cur = conn.cursor()
+
+    statement = '''
+    SELECT AVG(CaloriesDV), AVG(TotalFatDV), AVG(CholesterolDV), AVG(SodiumDV),
+            AVG(TotalCarbohydratesDV), AVG(FiberDV), AVG(SugarDV), AVG(ProteinDV)
+    FROM Nutrition_Facts
+    '''
+    cur.execute(statement)
+    conn.commit()
+
+    for item in cur:
+        cals = round(item[0],2)
+        fat = round(item[1], 2)
+        chol = round(item[2], 2)
+        sod = round(item[3], 2)
+        carbs = round(item[4], 2)
+        fib = round(item[5], 2)
+        sug = round(item[6], 2)
+        pro = round(item[7], 2)
+
+    nut_list = [cals, fat, chol, sod, carbs, fib, sug, pro]
+    print(nut_list)
+    return nut_list
+
+# get_nutrition_data()
+
+def nutrition_bar_chart():
+    lst = get_nutrition_data()
+
+    trace1 = go.Bar(
+    x=['CaloriesDV', 'TotalFatDV', 'CholesterolDV', 'SodiumDV', 'CarbohydratesDV', 'FiberDV', 'SugarDV', 'ProteinDV'],
+    y=lst,
+    name='Nutrition Fact Percentage of Daily Recommended Value'
+    )
+    trace2 = go.Bar(
+        x=['CaloriesDV', 'TotalFatDV', 'CholesterolDV', 'SodiumDV', 'CarbohydratesDV', 'FiberDV', 'SugarDV', 'ProteinDV'],
+        y=[100,100,100,100,100,100,100,100],
+        name='Daily Recommended Value'
+    )
+
+    data = [trace1, trace2]
+    layout = go.Layout(
+        barmode='stack'
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+    py.plot(fig, filename='stacked-bar')
+
+def get_pie_data():
+    pie_list = []
+    conn = sqlite3.connect(db_name)
+    cur = conn.cursor()
+
+    statement = '''
+    SELECT AVG(Calories), AVG(TotalFat), AVG(Cholesterol), AVG(Sodium),
+            AVG(TotalCarbohydrates), AVG(Fiber), AVG(Sugar), AVG(Protein)
+    FROM Nutrition_Facts
+    '''
+    cur.execute(statement)
+    conn.commit()
+
+    for item in cur:
+        fat = round(item[1], 2)
+        chol = round((item[2]/1000), 2)
+        sod = round((item[3]/1000), 2)
+        carbs = round(item[4], 2)
+        fib = round(item[5], 2)
+        sug = round(item[6], 2)
+        pro = round(item[7], 2)
+
+    pie_list = [fat, chol, sod, carbs, fib, sug, pro]
+    # print(pie_list)
+    return pie_list
+
+def pie_chart():
+    lst = get_pie_data()
+    labels = ['TotalFat(g)', 'Cholesterol(g)', 'Sodium(g)', 'Carbohydrates(g)', 'Fiber(g)', 'Sugar(g)', 'Protein(g)']
+    values = lst
+
+    trace = go.Pie(labels=labels, values=values)
+
+    py.plot([trace], filename='basic_pie_chart')
 
 def ask_user():
     user_input = ""
@@ -350,6 +597,19 @@ def ask_user():
                  """
 
     while user_input != "exit":
+        bread = []
+        cake = []
+        cookies = []
+        pasta_rice = []
+        alcohol = []
+        butter = []
+        cooked_fish = []
+        fresh_fish = []
+        fruit = []
+        beef = []
+        lamb = []
+        pork = []
+
         if user_input == "":
             print(prompt_choices)
             user_input = input("Please choose one of the options above (or 'help' for options): ")
@@ -369,7 +629,6 @@ def ask_user():
             make_database(cookies)
             user_input = input("Please choose one of the options above (or 'help' for options): ")
         elif user_input == "pasta and rice":
-            pasta_rice = []
             pasta = get_food_data("Pasta & Noodles")
             rice = get_food_data("Rice")
             for item in pasta:
@@ -379,7 +638,6 @@ def ask_user():
             make_database(pasta_rice)
             user_input = input("Please choose one of the options above (or 'help' for options): ")
         elif user_input == "alcohol":
-            alcohol = []
             beer = get_food_data("Beer")
             spirits = get_food_data("Spirits & Cocktails")
             wine = get_food_data("Wine")
@@ -404,7 +662,6 @@ def ask_user():
             make_database(fresh_fish)
             user_input = input("Please choose one of the options above (or 'help' for options): ")
         elif user_input == "fruit":
-            fruit = []
             apples = get_food_data("Apples")
             apricots = get_food_data("Apricots")
             berries = get_food_data("Berries")
@@ -455,8 +712,7 @@ def ask_user():
 
     print("Bye!")
 
-ask_user()
+# ask_user()
+
 # bread = get_food_data("Bread")
-# # for item in bread:
-# #     print(item.vita)
-# make_database(bread)
+# plot_ternary(bread)
