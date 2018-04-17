@@ -339,22 +339,44 @@ def make_database(list_food):
 
     conn.close()
 
-def plotly_data(lst):
+def plotly_data():
     plotly_list = []
     plotly_dict = {}
     i = 1
 
-    for item in lst:
-        plotly_dict['fat'] = float(item.fat)
-        plotly_dict['protein'] = float(item.protein)
-        plotly_dict['carbs'] = float(item.carbs)
+    conn = sqlite3.connect(db_name)
+    cur = conn.cursor()
+
+    statement = '''
+    SELECT TotalFat, Protein, TotalCarbohydrates
+    FROM Nutrition_Facts
+    '''
+    cur.execute(statement)
+    conn.commit()
+
+    for item in cur:
+        plotly_dict['fat'] = float(item[0])
+        plotly_dict['protein'] = float(item[1])
+        plotly_dict['carbs'] = float(item[2])
         point_i = "point " + str(i)
         plotly_dict['label'] = point_i
         plotly_list.append(plotly_dict)
         i += 1
         plotly_dict = {}
 
+
+    # for item in lst:
+    #     plotly_dict['fat'] = float(item.fat)
+    #     plotly_dict['protein'] = float(item.protein)
+    #     plotly_dict['carbs'] = float(item.carbs)
+    #     point_i = "point " + str(i)
+    #     plotly_dict['label'] = point_i
+    #     plotly_list.append(plotly_dict)
+    #     i += 1
+    #     plotly_dict = {}
+    # print(plotly_list)
     return plotly_list
+
 
 def makeAxis(title, tickangle):
     return {
@@ -368,8 +390,8 @@ def makeAxis(title, tickangle):
       'showgrid': True
     }
 
-def plot_ternary(lst):
-    rawData = plotly_data(lst)
+def plot_ternary():
+    rawData = plotly_data()
 
     data = [{
         'type': 'scatterternary',
@@ -405,7 +427,7 @@ def plot_ternary(lst):
     fig = {'data': data, 'layout': layout}
     py.plot(fig, validate=False)
 
-
+# plot_ternary()
 def stacked_bar_data():
     vit_list = []
     conn = sqlite3.connect(db_name)
@@ -429,7 +451,7 @@ def stacked_bar_data():
 
     return vit_list
 
-stacked_bar_data()
+# stacked_bar_data()
 def make_stacked_bar():
     lst = stacked_bar_data()
 
@@ -512,7 +534,7 @@ def get_nutrition_data():
         pro = round(item[7], 2)
 
     nut_list = [cals, fat, chol, sod, carbs, fib, sug, pro]
-    print(nut_list)
+    # print(nut_list)
     return nut_list
 
 # get_nutrition_data()
@@ -576,7 +598,18 @@ def pie_chart():
 
 def ask_user():
     user_input = ""
-    baked = []
+    bread = []
+    cake = []
+    cookies = []
+    pasta_rice = []
+    alcohol = []
+    butter = []
+    cooked_fish = []
+    fresh_fish = []
+    fruit = []
+    beef = []
+    lamb = []
+    pork = []
     prompt_choices = """
             bread
             cake
@@ -591,44 +624,85 @@ def ask_user():
             fruit
                 (includes apples, apricots, berries, citrus, grapes, melons,
                 peaches, pears, plums, tropical)
-            Beef
-            Lamb
-            Pork
+            beef
+            lamb
+            pork
                  """
 
-    while user_input != "exit":
-        bread = []
-        cake = []
-        cookies = []
-        pasta_rice = []
-        alcohol = []
-        butter = []
-        cooked_fish = []
-        fresh_fish = []
-        fruit = []
-        beef = []
-        lamb = []
-        pork = []
+    graph_choices = """
+            ternary
+                graph of fat, protein, and carbs as three points of triangle for
+                each food within the category
+            vitamins
+                bar graph of the average vitamins and minerals for the food category
+                compared to the daily recommended values
+            nutrition
+                bar graph of the average percent daily values of general nutrition
+                facts compared to the daily recommended values for the food category
+            pie
+                pie chart of the averages of the general nutrition facts for the
+                food category
 
+    """
+
+    food_graph = """
+          Food Choices:
+            bread
+            cake
+            cookies
+            pasta and rice
+            alcohol
+                (includes beer, spirits, cocktails, and wine)
+            butter
+                (includes butter and margarine)
+            cooked fish
+            fresh fish
+            fruit
+                (includes apples, apricots, berries, citrus, grapes, melons,
+                peaches, pears, plums, tropical)
+            beef
+            lamb
+            pork
+        ---------------------------------------------------------------------------
+          Graph Choices:
+            ternary
+                graph of fat, protein, and carbs as three points of triangle for
+                each food within the category
+            vitamins
+                bar graph of the average vitamins and minerals for the food category
+                compared to the daily recommended values
+            nutrition
+                bar graph of the average percent daily values of general nutrition
+                facts compared to the daily recommended values for the food category
+            pie
+                pie chart of the averages of the general nutrition facts for the
+                food category
+
+    """
+
+    while user_input != "exit":
         if user_input == "":
             print(prompt_choices)
             user_input = input("Please choose one of the options above (or 'help' for options): ")
-        elif user_input == "help":
+        elif user_input.lower() == "help":
             print(prompt_choices)
             user_input = input("Please choose one of the options above: ")
-        elif user_input == "bread":
+        elif user_input.lower() == "bread":
             bread = get_food_data("Bread")
             make_database(bread)
-            user_input = input("Please choose one of the options above (or 'help' for options): ")
-        elif user_input == "cake":
+            print(graph_choices)
+            user_input = input("Please choose a graph above to display the data: ")
+        elif user_input.lower() == "cake":
             cake = get_food_data("Cake")
             make_database(cake)
-            user_input = input("Please choose one of the options above (or 'help' for options): ")
-        elif user_input == "cookies":
+            print(graph_choices)
+            user_input = input("Please choose a graph above to display the data: ")
+        elif user_input.lower() == "cookies":
             cookies = get_food_data("Cookies")
             make_database(cookies)
-            user_input = input("Please choose one of the options above (or 'help' for options): ")
-        elif user_input == "pasta and rice":
+            print(graph_choices)
+            user_input = input("Please choose a graph above to display the data: ")
+        elif user_input.lower() == "pasta and rice":
             pasta = get_food_data("Pasta & Noodles")
             rice = get_food_data("Rice")
             for item in pasta:
@@ -636,8 +710,9 @@ def ask_user():
             for k in rice:
                 pasta_rice.append(k)
             make_database(pasta_rice)
-            user_input = input("Please choose one of the options above (or 'help' for options): ")
-        elif user_input == "alcohol":
+            print(graph_choices)
+            user_input = input("Please choose a graph above to display the data: ")
+        elif user_input.lower() == "alcohol":
             beer = get_food_data("Beer")
             spirits = get_food_data("Spirits & Cocktails")
             wine = get_food_data("Wine")
@@ -648,20 +723,24 @@ def ask_user():
             for x in wine:
                 alcohol.append(x)
             make_database(alcohol)
-            user_input = input("Please choose one of the options above (or 'help' for options): ")
-        elif user_input == "butter":
+            print(graph_choices)
+            user_input = input("Please choose a graph above to display the data: ")
+        elif user_input.lower() == "butter":
             butter = get_food_data("Butter & Margarine")
             make_database(butter)
-            user_input = input("Please choose one of the options above (or 'help' for options): ")
-        elif user_input == "cooked fish":
+            print(graph_choices)
+            user_input = input("Please choose a graph above to display the data: ")
+        elif user_input.lower() == "cooked fish":
             cooked_fish = get_food_data("Cooked Finfish")
             make_database(cooked_fish)
-            user_input = input("Please choose one of the options above (or 'help' for options): ")
-        elif user_input == "cooked fish":
+            print(graph_choices)
+            user_input = input("Please choose a graph above to display the data: ")
+        elif user_input.lower() == "cooked fish":
             fresh_fish = get_food_data("Fresh Finfish")
             make_database(fresh_fish)
-            user_input = input("Please choose one of the options above (or 'help' for options): ")
-        elif user_input == "fruit":
+            print(graph_choices)
+            user_input = input("Please choose a graph above to display the data: ")
+        elif user_input.lower() == "fruit":
             apples = get_food_data("Apples")
             apricots = get_food_data("Apricots")
             berries = get_food_data("Berries")
@@ -693,26 +772,63 @@ def ask_user():
             for t in tropical:
                 fruit.append(t)
             make_database(fruit)
-            user_input = input("Please choose one of the options above (or 'help' for options): ")
-        elif user_input == "beef":
+            print(graph_choices)
+            user_input = input("Please choose a graph above to display the data: ")
+        elif user_input.lower() == "beef":
             beef = get_food_data("Beef")
             make_database(beef)
-            user_input = input("Please choose one of the options above (or 'help' for options): ")
-        elif user_input == "lamb":
+            print(graph_choices)
+            user_input = input("Please choose a graph above to display the data: ")
+        elif user_input.lower() == "lamb":
             lamb = get_food_data("Lamb")
             make_database(lamb)
-            user_input = input("Please choose one of the options above (or 'help' for options): ")
-        elif user_input == "pork":
+            print(graph_choices)
+            user_input = input("Please choose a graph above to display the data: ")
+        elif user_input.lower() == "pork":
             pork = get_food_data("Pork")
             make_database(pork)
-            user_input = input("Please choose one of the options above (or 'help' for options): ")
+            print(graph_choices)
+            user_input = input("Please choose a graph above to display the data: ")
+        elif user_input.lower() == "ternary":
+            try:
+                plot_ternary()
+                print(food_graph)
+                user_input = input("Please choose one of the options above (or 'help' for options): ")
+            except:
+                print(prompt_choices)
+                user_input = input("Please choose one of the options above (or 'help' for options): ")
+        elif user_input.lower() == "vitamins":
+            try:
+                make_stacked_bar()
+                print(food_graph)
+                user_input = input("Please choose one of the options above (or 'help' for options): ")
+            except:
+                print(prompt_choices)
+                user_input = input("Please choose one of the options above (or 'help' for options): ")
+        elif user_input.lower() == "nutrition":
+            try:
+                nutrition_bar_chart()
+                print(food_graph)
+                user_input = input("Please choose one of the options above (or 'help' for options): ")
+            except:
+                print(prompt_choices)
+                user_input = input("Please choose one of the options above (or 'help' for options): ")
+        elif user_input.lower() == "pie":
+            try:
+                pie_chart()
+                print(food_graph)
+                user_input = input("Please choose one of the options above (or 'help' for options): ")
+            except:
+                print(prompt_choices)
+                user_input = input("Please choose one of the options above (or 'help' for options): ")
         else:
             print("Sorry, that is not a valid option")
+            print(prompt_choices)
             user_input = input("Please choose one of the options above (or 'help' for options): ")
 
     print("Bye!")
 
-# ask_user()
+ask_user()
 
 # bread = get_food_data("Bread")
 # plot_ternary(bread)
