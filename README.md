@@ -5,7 +5,8 @@ how to obtain these and instructions for how to incorporate them into your progr
   to run the program.
 
 Any other information needed to run the program (e.g., pointer to getting started info for plotly)
-  - N/A
+  - Information on setting up plotly can be found here:
+    https://plot.ly/python/getting-started/
 
 Brief description of how your code is structured, including the names of significant data processing functions
 (just the 2-3 most important functions--not a complete list) and class definitions. If there are large data structures (e.g., lists, dictionaries) that you create to organize your data for presentation, briefly describe them.
