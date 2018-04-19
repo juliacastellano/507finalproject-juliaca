@@ -34,6 +34,8 @@ def make_request_using_cache(url):
     else:
         print("Making a request for new data...")
         # Make the request and cache the new data
+        session = requests.Session()
+        session.max_redirects = 60
         resp = requests.get(url)
         CACHE_DICTION[unique_ident] = resp.text
         dumped_json_cache = json.dumps(CACHE_DICTION)
@@ -540,6 +542,7 @@ def get_pie_data():
     conn.commit()
 
     for item in cur:
+        cals = round(item[0], 2)
         fat = round(item[1], 2)
         chol = round((item[2]/1000), 2)
         sod = round((item[3]/1000), 2)
@@ -548,11 +551,12 @@ def get_pie_data():
         sug = round(item[6], 2)
         pro = round(item[7], 2)
 
-    pie_list = [fat, chol, sod, carbs, fib, sug, pro]
+    pie_list = [cals, fat, chol, sod, carbs, fib, sug, pro]
     return pie_list
 
 def pie_chart():
-    lst = get_pie_data()
+    lst1 = get_pie_data()
+    lst = lst1[1:]
     labels = ['TotalFat(g)', 'Cholesterol(g)', 'Sodium(g)', 'Carbohydrates(g)', 'Fiber(g)', 'Sugar(g)', 'Protein(g)']
     values = lst
 
@@ -563,7 +567,7 @@ def pie_chart():
 def make_table():
     list1 = ["Calories (kcal)", "Fat (g)", "Cholesterol (mg)", "Sodium (mg)", "Carbohydrates (g)", "Fiber (g)", "Sugar (g)", "Protein (g)"]
     list2 = ["Vitamin A (IU)", "Vitamin C (mg)", "Iron (mg)", "Calcium (mg)", "Potassium (mg)"]
-    list3 = get_nutrition_data()
+    list3 = get_pie_data()
     list4 = stacked_bar_data()
 
     title_list = list1 + list2
@@ -647,7 +651,7 @@ def ask_user():
         elif user_input.lower() == "bread":
             bread = get_food_data("Bread")
             make_database(bread)
-            bread
+            make_table()
             print(graph_choices)
             user_input = input("Please choose a graph above to display the data: ")
         elif user_input.lower() == "cake":
