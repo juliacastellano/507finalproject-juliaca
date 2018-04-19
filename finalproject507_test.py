@@ -76,7 +76,7 @@ class TestDatabase(unittest.TestCase):
 
         conn.close()
 
-class TestMapping(unittest.TestCase):
+class TestPlotly(unittest.TestCase):
     def test_table(self):
         conn = sqlite3.connect(db_name)
         cur = conn.cursor()

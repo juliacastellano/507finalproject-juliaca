@@ -20,33 +20,33 @@ Brief user guide, including how to run the program and how to choose presentatio
     so that you can see the averages for the different nutrition facts. Then you can either choose one of four graph options
     to see the data visualized in plotly or choose a different food category. You can type "help" to see the options and "exit" to exit the program at any time. The different food category and graph options can be seen below:
 
-    Food Choices:
-            bread
-            cake
-            cookies and pastry
-            pasta and rice
-            cheese
+        Food Choices:
+            bread,
+            cake,
+            cookies and pastry,
+            pasta and rice,
+            cheese,
             fruit
                 (includes apples, apricots, berries, citrus, grapes, melons,
-                peaches, pears, plums, tropical)
-            candy
+                peaches, pears, plums, tropical),
+            candy,
             salty snacks
-                (includes popcorn, pretzels, chips)
+                (includes popcorn, pretzels, chips),
             ice cream
-                (includes ice cream, custard, pudding)
+                (includes ice cream, custard, pudding),
             alcohol
-                (includes beer, spirits, cocktails, and wine)
+                (includes beer, spirits, cocktails, and wine),
         ----------------------------------------------------------------------------
-    Graph Choices:
-            ternary
+        Graph Choices:
+            ternary:
                 graph of fat, protein, and carbs as three points of triangle for
-                each food within the category
-            vitamins
+                each food within the category,
+            vitamins:
                 bar graph of the average vitamins and minerals for the food category
-                compared to the daily recommended values
-            nutrition
+                compared to the daily recommended values,
+            nutrition:
                 bar graph of the average percent daily values of general nutrition
-                facts compared to the daily recommended values for the food category
-            pie
+                facts compared to the daily recommended values for the food category,
+            pie:
                 pie chart of the averages of the general nutrition facts for the
                 food category

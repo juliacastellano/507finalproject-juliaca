@@ -647,13 +647,13 @@ def ask_user():
         elif user_input.lower() == "bread":
             bread = get_food_data("Bread")
             make_database(bread)
-            # make_table()
+            bread
             print(graph_choices)
             user_input = input("Please choose a graph above to display the data: ")
         elif user_input.lower() == "cake":
             cake = get_food_data("Cake")
             make_database(cake)
-            # make_table()
+            make_table()
             print(graph_choices)
             user_input = input("Please choose a graph above to display the data: ")
         elif user_input.lower() == "cookies and pastry":
@@ -664,7 +664,7 @@ def ask_user():
             for p in pastry:
                 cookies_pastry.append(p)
             make_database(cookies_pastry)
-            # make_table()
+            make_table()
             print(graph_choices)
             user_input = input("Please choose a graph above to display the data: ")
         elif user_input.lower() == "pasta and rice":
@@ -675,7 +675,7 @@ def ask_user():
             for k in rice:
                 pasta_rice.append(k)
             make_database(pasta_rice)
-            # make_table()
+            make_table()
             print(graph_choices)
             user_input = input("Please choose a graph above to display the data: ")
         elif user_input.lower() == "alcohol":
@@ -689,7 +689,7 @@ def ask_user():
             for x in wine:
                 alcohol.append(x)
             make_database(alcohol)
-            # make_table()
+            make_table()
             print(graph_choices)
             user_input = input("Please choose a graph above to display the data: ")
         elif user_input.lower() == "candy":
@@ -703,7 +703,7 @@ def ask_user():
             for x in chocolate:
                 candy_agg.append(x)
             make_database(candy_agg)
-            # make_table()
+            make_table()
             print(graph_choices)
             user_input = input("Please choose a graph above to display the data: ")
         elif user_input.lower() == "salty snacks":
@@ -720,7 +720,7 @@ def ask_user():
             for s in snacks:
                 salty.append(s)
             make_database(salty)
-            # make_table()
+            make_table()
             print(graph_choices)
             user_input = input("Please choose a graph above to display the data: ")
         elif user_input.lower() == "fruit":
@@ -755,7 +755,7 @@ def ask_user():
             for t in tropical:
                 fruit.append(t)
             make_database(fruit)
-            # make_table()
+            make_table()
             print(graph_choices)
             user_input = input("Please choose a graph above to display the data: ")
         elif user_input.lower() == "ice cream":
@@ -769,7 +769,7 @@ def ask_user():
             for x in pudding:
                 ice.append(x)
             make_database(ice)
-            # make_table()
+            make_table()
             print(graph_choices)
             user_input = input("Please choose a graph above to display the data: ")
         elif user_input.lower() == "cheese":
@@ -780,7 +780,7 @@ def ask_user():
             for k in processed:
                 cheese.append(k)
             make_database(cheese)
-            # make_table()
+            make_table()
             print(graph_choices)
             user_input = input("Please choose a graph above to display the data: ")
         elif user_input.lower() == "ternary":
