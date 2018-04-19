@@ -76,5 +76,71 @@ class TestDatabase(unittest.TestCase):
 
         conn.close()
 
+class TestMapping(unittest.TestCase):
+    def test_table(self):
+        conn = sqlite3.connect(db_name)
+        cur = conn.cursor()
+
+        cake = get_food_data("Cake")
+        make_database(cake)
+        try:
+            make_table()
+        except:
+            self.fail()
+
+        conn.close()
+
+    def test_ternary(self):
+        conn = sqlite3.connect(db_name)
+        cur = conn.cursor()
+
+        cake = get_food_data("Cake")
+        make_database(cake)
+        try:
+            plot_ternary()
+        except:
+            self.fail()
+
+        conn.close()
+
+    def test_vitamins(self):
+        conn = sqlite3.connect(db_name)
+        cur = conn.cursor()
+
+        cake = get_food_data("Cake")
+        make_database(cake)
+        try:
+            vitamin_stacked_bar()
+        except:
+            self.fail()
+
+        conn.close()
+
+    def test_nutrition(self):
+        conn = sqlite3.connect(db_name)
+        cur = conn.cursor()
+
+        cake = get_food_data("Cake")
+        make_database(cake)
+        try:
+            nutrition_bar_chart()
+        except:
+            self.fail()
+
+        conn.close()
+
+    def test_pie(self):
+        conn = sqlite3.connect(db_name)
+        cur = conn.cursor()
+
+        cake = get_food_data("Cake")
+        make_database(cake)
+        try:
+            pie_chart()
+        except:
+            self.fail()
+
+        conn.close()
+
 if __name__ == '__main__':
     unittest.main()

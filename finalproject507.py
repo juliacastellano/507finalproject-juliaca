@@ -423,13 +423,16 @@ def stacked_bar_data():
 
     return vit_list
 
-def make_stacked_bar():
+def vitamin_stacked_bar():
     lst = stacked_bar_data()
     lst2 = [0.9, 90, 18, 1300, 4700]
     lst3 = []
     i = 0
     for item in lst:
-        lst3.append(lst2[i]-item)
+        if lst2[i]-item < 0:
+            lst3.append(0)
+        else:
+            lst3.append(lst2[i]-item)
         i += 1
 
 
@@ -498,7 +501,10 @@ def nutrition_bar_chart():
     lst3 = []
     i = 0
     for item in lst:
-        lst3.append(lst2[i]-item)
+        if lst2[i]-item < 0:
+            lst3.append(0)
+        else:
+            lst3.append(lst2[i]-item)
         i += 1
 
     trace1 = go.Bar(
@@ -593,6 +599,7 @@ def ask_user():
     ice = []
     cheese = []
     prompt_choices = """
+        Food Choices:
             bread
             cake
             cookies and pastry
@@ -608,9 +615,11 @@ def ask_user():
                 (includes ice cream, custard, pudding)
             alcohol
                 (includes beer, spirits, cocktails, and wine)
+        ----------------------------------------------------------------------------
                  """
 
     graph_choices = """
+        Graph Choices:
             ternary
                 graph of fat, protein, and carbs as three points of triangle for
                 each food within the category
@@ -626,39 +635,7 @@ def ask_user():
 
     """
 
-    food_graph = """
-          Food Choices:
-            bread
-            cake
-            cookies and pastry
-            pasta and rice
-            cheese
-            fruit
-                (includes apples, apricots, berries, citrus, grapes, melons,
-                peaches, pears, plums, tropical)
-            candy
-            salty snacks
-                (includes popcorn, pretzels, chips)
-            ice cream
-                (includes ice cream, custard, pudding)
-            alcohol
-                (includes beer, spirits, cocktails, and wine)
-        ---------------------------------------------------------------------------
-          Graph Choices:
-            ternary
-                graph of fat, protein, and carbs as three points of triangle for
-                each food within the category
-            vitamins
-                bar graph of the average vitamins and minerals for the food category
-                compared to the daily recommended values
-            nutrition
-                bar graph of the average percent daily values of general nutrition
-                facts compared to the daily recommended values for the food category
-            pie
-                pie chart of the averages of the general nutrition facts for the
-                food category
-
-    """
+    food_graph = prompt_choices + graph_choices
 
     while user_input != "exit":
         if user_input == "":
@@ -816,7 +793,7 @@ def ask_user():
                 user_input = input("Please choose one of the options above (or 'help' for options): ")
         elif user_input.lower() == "vitamins":
             try:
-                make_stacked_bar()
+                vitamin_stacked_bar()
                 print(food_graph)
                 user_input = input("Please choose one of the options above (or 'help' for options): ")
             except:
