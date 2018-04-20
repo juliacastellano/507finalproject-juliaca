@@ -26,13 +26,13 @@ def make_request_using_cache(url):
 
     ## first, look in the cache to see if we already have this data
     if unique_ident in CACHE_DICTION:
-        # print("Getting cached data...")
+        print("Getting cached data...")
         return CACHE_DICTION[unique_ident]
 
     ## if not, fetch the data afresh, add it to the cache,
     ## then write the cache to file
     else:
-        # print("Making a request for new data...")
+        print("Making a request for new data...")
         # Make the request and cache the new data
         resp = requests.get(url)
         CACHE_DICTION[unique_ident] = resp.text
