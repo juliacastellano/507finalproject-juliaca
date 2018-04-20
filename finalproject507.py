@@ -34,8 +34,6 @@ def make_request_using_cache(url):
     else:
         # print("Making a request for new data...")
         # Make the request and cache the new data
-        session = requests.Session()
-        session.max_redirects = 60
         resp = requests.get(url)
         CACHE_DICTION[unique_ident] = resp.text
         dumped_json_cache = json.dumps(CACHE_DICTION)
